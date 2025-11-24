@@ -8,8 +8,8 @@ if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true
 }
 
 // Hardcoded credentials
-$admin_email = "ineshfernando643@gmail.com";
-$admin_password = "200605";
+$admin_email = "admin@gmail.com";
+$admin_password = "admin123";
 
 $error = "";
 
