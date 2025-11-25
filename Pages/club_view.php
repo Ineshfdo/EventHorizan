@@ -94,6 +94,11 @@ $past_events = array_merge($auto_past_events, $manual_past_events);
   50% { transform: translateY(-20px) rotate(5deg); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
 .animate-fade-in-up {
   animation: fadeInUp 0.8s ease-out forwards;
 }
@@ -171,6 +176,70 @@ $past_events = array_merge($auto_past_events, $manual_past_events);
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
   position: relative;
   z-index: 1;
+}
+
+/* Hero section */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.hero-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  color: white;
+  padding: 2rem;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-image {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Content grid */
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Info cards */
+.info-card {
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+
+.info-card:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 /* Extra images with glass effect */
@@ -367,6 +436,7 @@ $past_events = array_merge($auto_past_events, $manual_past_events);
   background-clip: text;
   position: relative;
   padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .section-title::after {
@@ -380,12 +450,27 @@ $past_events = array_merge($auto_past_events, $manual_past_events);
   border-radius: 2px;
 }
 
+/* Tag styling */
+.tag {
+  display: inline-block;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .shape-1 { width: 150px; height: 150px; }
   .shape-2 { width: 120px; height: 120px; }
   .shape-3 { width: 80px; height: 80px; }
   .shape-4 { width: 100px; height: 100px; }
+  .hero-title { font-size: 2rem; }
+  .hero-image { height: 300px; }
 }
 </style>
 
@@ -412,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- =======================
-        MAIN CARD
+        MAIN CONTENT
 ======================= -->
 <div class="club-view-container max-w-5xl mx-auto mt-16 mb-28 px-4">
     <!-- Floating shapes -->
@@ -421,181 +506,217 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="floating-shape shape-3"></div>
     <div class="floating-shape shape-4"></div>
 
-    <div class="club-main-card p-10 rounded-3xl animate-fade-in">
-
-    <!-- MAIN CLUB IMAGE -->
-    <?php if (!empty($club['club_main_image'])): ?>
-        <img src="../uploads/<?= htmlspecialchars($club['club_main_image']) ?>"
-             class="w-full h-72 object-cover rounded-2xl shadow-lg mb-6">
-    <?php endif; ?>
-
-    <!-- EXTRA IMAGES GRID -->
-    <?php if (!empty($club['club_extra_image_1']) || !empty($club['club_extra_image_2']) || !empty($club['club_extra_image_3'])): ?>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <?php if (!empty($club['club_extra_image_1'])): ?>
-            <div class="extra-image-card">
-                <img src="../uploads/<?= htmlspecialchars($club['club_extra_image_1']) ?>"
-                     alt="Club Image 1"
-                     class="h-40">
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($club['club_extra_image_2'])): ?>
-            <div class="extra-image-card">
-                <img src="../uploads/<?= htmlspecialchars($club['club_extra_image_2']) ?>"
-                     alt="Club Image 2"
-                     class="h-40">
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($club['club_extra_image_3'])): ?>
-            <div class="extra-image-card">
-                <img src="../uploads/<?= htmlspecialchars($club['club_extra_image_3']) ?>"
-                     alt="Club Image 3"
-                     class="h-40">
-            </div>
-        <?php endif; ?>
-    </div>
-    <?php endif; ?>
-
-    <!-- CLUB NAME -->
-    <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
-        <?= htmlspecialchars($club['club_name']) ?>
-    </h1>
-
-    <!-- CLUB DESCRIPTION -->
-    <p class="text-gray-700 text-lg leading-relaxed mb-10 whitespace-pre-line">
-        <?= nl2br(htmlspecialchars($club['club_description'])) ?>
-    </p>
-
-
-    <!-- =======================
-        UPCOMING EVENTS
-    ======================== -->
-    <div class="mb-12">
-        <h2 class="section-title mb-6">Upcoming Events</h2>
-
-        <?php if ($events): ?>
-            <div class="space-y-3">
-            <?php foreach ($events as $event): ?>
-                <a href="event_view.php?id=<?= $event['id'] ?>"
-                   class="event-card block p-4 text-gray-900 font-medium relative z-10">
-                    <span class="relative z-10"><?= htmlspecialchars($event['title']) ?></span>
-                </a>
-            <?php endforeach; ?>
+    <!-- Hero Section -->
+    <div class="hero-section animate-fade-in">
+        <?php if (!empty($club['club_main_image'])): ?>
+            <img src="../uploads/<?= htmlspecialchars($club['club_main_image']) ?>"
+                 class="hero-image">
+            <div class="hero-content">
+                <h1 class="hero-title"><?= htmlspecialchars($club['club_name']) ?></h1>
+                <div class="flex flex-wrap">
+                    <?php if (!empty($club['contact_number_1'])): ?>
+                        <span class="tag">Contact Available</span>
+                    <?php endif; ?>
+                    <?php if ($events): ?>
+                        <span class="tag">Upcoming Events</span>
+                    <?php endif; ?>
+                    <?php if ($past_events): ?>
+                        <span class="tag">Past Events</span>
+                    <?php endif; ?>
+                </div>
             </div>
         <?php else: ?>
-            <p class="text-gray-600 italic">No upcoming events for this club.</p>
+            <div class="hero-image bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                <h1 class="hero-title text-white text-center"><?= htmlspecialchars($club['club_name']) ?></h1>
+            </div>
         <?php endif; ?>
     </div>
 
+    <div class="content-grid">
+        <!-- Main Content Column -->
+        <div class="main-content">
+            <!-- About Club Section -->
+            <div class="info-card animate-fade-in-up">
+                <h2 class="section-title">About Our Club</h2>
+                <p class="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                    <?= nl2br(htmlspecialchars($club['club_description'])) ?>
+                </p>
+            </div>
 
-    <!-- =======================
-        PAST EVENTS
-    ======================== -->
-    <div>
-        <h2 class="section-title mb-8">Past Events</h2>
-
-        <?php if ($past_events): ?>
-
-            <div class="grid md:grid-cols-2 gap-8">
-
-                <?php 
-                $index = 0;
-                foreach ($past_events as $p): 
-                    $delayClass = ($index % 2 === 0) ? 'animation-delay-200' : 'animation-delay-400';
-                    $index++;
-                ?>
-                <div class="past-event-card <?= $delayClass ?>">
-
-                    <!-- MAIN IMAGE -->
-                    <?php if (!empty($p['main_image'])): ?>
-                        <img src="../uploads/<?= $p['main_image'] ?>"
-                             class="w-full h-48 object-cover rounded-xl shadow mb-4">
+            <!-- EXTRA IMAGES GRID -->
+            <?php if (!empty($club['club_extra_image_1']) || !empty($club['club_extra_image_2']) || !empty($club['club_extra_image_3'])): ?>
+            <div class="info-card animate-fade-in-up animation-delay-200">
+                <h2 class="section-title">Gallery</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <?php if (!empty($club['club_extra_image_1'])): ?>
+                        <div class="extra-image-card">
+                            <img src="../uploads/<?= htmlspecialchars($club['club_extra_image_1']) ?>"
+                                 alt="Club Image 1"
+                                 class="h-40">
+                        </div>
                     <?php endif; ?>
 
-                    <!-- EXTRA IMAGES -->
-                    <div class="grid grid-cols-3 gap-2 mb-4">
-                        <?php if (!empty($p['extra_image_1'])): ?>
-                            <img src="../uploads/<?= $p['extra_image_1'] ?>" 
-                                 class="h-20 w-full object-cover rounded shadow">
-                        <?php endif; ?>
+                    <?php if (!empty($club['club_extra_image_2'])): ?>
+                        <div class="extra-image-card">
+                            <img src="../uploads/<?= htmlspecialchars($club['club_extra_image_2']) ?>"
+                                 alt="Club Image 2"
+                                 class="h-40">
+                        </div>
+                    <?php endif; ?>
 
-                        <?php if (!empty($p['extra_image_2'])): ?>
-                            <img src="../uploads/<?= $p['extra_image_2'] ?>" 
-                                 class="h-20 w-full object-cover rounded shadow">
-                        <?php endif; ?>
-
-                        <?php if (!empty($p['extra_image_3'])): ?>
-                            <img src="../uploads/<?= $p['extra_image_3'] ?>" 
-                                 class="h-20 w-full object-cover rounded shadow">
-                        <?php endif; ?>
-                    </div>
-
-                    <!-- TITLE -->
-                    <h3 class="text-lg font-bold text-gray-900 mb-2">
-                        <?= htmlspecialchars($p['title'] ?? $p['event_title']) ?>
-                    </h3>
-
-                    <!-- SHORT DESCRIPTION WITH SEE MORE -->
-                    <?php
-                        $desc = $p['description'] ?? $p['event_description'];
-                        $words = explode(" ", $desc);
-                        $short = implode(" ", array_slice($words, 0, 15));
-                        $isLong = count($words) > 15;
-                    ?>
-
-                    <p class="text-gray-700 text-sm leading-relaxed mb-3">
-                        <span class="short-desc"><?= htmlspecialchars($short) ?><?= $isLong ? '...' : '' ?></span>
-
-                        <?php if ($isLong): ?>
-                            <span class="full-desc hidden"><?= nl2br(htmlspecialchars($desc)) ?></span>
-                            <button class="toggleDesc text-blue-600 text-sm underline">Show More</button>
-                        <?php endif; ?>
-                    </p>
-
-                    <!-- DATE TYPE -->
-                    <p class="text-xs text-gray-500">
-                        <?= $p['source_type'] == "auto"
-                            ? "Event Date: " . htmlspecialchars($p['event_date'])
-                            : "Added On: " . htmlspecialchars($p['created_at']) ?>
-                    </p>
-
+                    <?php if (!empty($club['club_extra_image_3'])): ?>
+                        <div class="extra-image-card">
+                            <img src="../uploads/<?= htmlspecialchars($club['club_extra_image_3']) ?>"
+                                 alt="Club Image 3"
+                                 class="h-40">
+                        </div>
+                    <?php endif; ?>
                 </div>
-                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
 
+            <!-- =======================
+                UPCOMING EVENTS
+            ======================== -->
+            <div class="info-card animate-fade-in-up animation-delay-400">
+                <h2 class="section-title">Upcoming Events</h2>
+
+                <?php if ($events): ?>
+                    <div class="space-y-3">
+                    <?php foreach ($events as $event): ?>
+                        <a href="event_view.php?id=<?= $event['id'] ?>"
+                           class="event-card block p-4 text-gray-900 font-medium relative z-10">
+                            <div class="flex justify-between items-center">
+                                <span class="relative z-10"><?= htmlspecialchars($event['title']) ?></span>
+                                <span class="text-sm text-gray-600"><?= htmlspecialchars($event['event_date']) ?></span>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="text-gray-600 italic">No upcoming events for this club.</p>
+                <?php endif; ?>
             </div>
 
-        <?php else: ?>
-            <p class="text-gray-600 italic">No past events found.</p>
-        <?php endif; ?>
+            <!-- =======================
+                PAST EVENTS
+            ======================== -->
+            <div class="info-card animate-fade-in-up animation-delay-600">
+                <h2 class="section-title">Past Events</h2>
 
+                <?php if ($past_events): ?>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <?php 
+                        $index = 0;
+                        foreach ($past_events as $p): 
+                            $delayClass = ($index % 2 === 0) ? 'animation-delay-200' : 'animation-delay-400';
+                            $index++;
+                        ?>
+                        <div class="past-event-card <?= $delayClass ?>">
+                            <!-- MAIN IMAGE -->
+                            <?php if (!empty($p['main_image'])): ?>
+                                <img src="../uploads/<?= $p['main_image'] ?>"
+                                     class="w-full h-48 object-cover rounded-xl shadow mb-4">
+                            <?php endif; ?>
 
-        <!-- =======================
-            CONTACT INFO
-        ======================== -->
-        <div class="contact-card mt-12">
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-                Contact Information
-            </h3>
+                            <!-- TITLE -->
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                <?= htmlspecialchars($p['title'] ?? $p['event_title']) ?>
+                            </h3>
 
-            <?php if (!empty($club['contact_description_1'])): ?>
-                <p class="text-gray-700 mb-3 leading-relaxed"><?= nl2br(htmlspecialchars($club['contact_description_1'])) ?></p>
-            <?php endif; ?>
+                            <!-- SHORT DESCRIPTION WITH SEE MORE -->
+                            <?php
+                                $desc = $p['description'] ?? $p['event_description'];
+                                $words = explode(" ", $desc);
+                                $short = implode(" ", array_slice($words, 0, 15));
+                                $isLong = count($words) > 15;
+                            ?>
 
-            <?php if (!empty($club['contact_number_1'])): ?>
-                <p class="text-gray-700 mb-2 font-medium">Contact 1: <span class="text-blue-600"><?= htmlspecialchars($club['contact_number_1']) ?></span></p>
-            <?php endif; ?>
+                            <p class="text-gray-700 text-sm leading-relaxed mb-3">
+                                <span class="short-desc"><?= htmlspecialchars($short) ?><?= $isLong ? '...' : '' ?></span>
 
-            <?php if (!empty($club['contact_number_2'])): ?>
-                <p class="text-gray-700 font-medium">Contact 2: <span class="text-blue-600"><?= htmlspecialchars($club['contact_number_2']) ?></span></p>
-            <?php endif; ?>
+                                <?php if ($isLong): ?>
+                                    <span class="full-desc hidden"><?= nl2br(htmlspecialchars($desc)) ?></span>
+                                    <button class="toggleDesc text-blue-600 text-sm underline">Show More</button>
+                                <?php endif; ?>
+                            </p>
+
+                            <!-- DATE TYPE -->
+                            <p class="text-xs text-gray-500">
+                                <?= $p['source_type'] == "auto"
+                                    ? "Event Date: " . htmlspecialchars($p['event_date'])
+                                    : "Added On: " . htmlspecialchars($p['created_at']) ?>
+                            </p>
+
+                            <!-- EXTRA IMAGES -->
+                            <?php if (!empty($p['extra_image_1']) || !empty($p['extra_image_2']) || !empty($p['extra_image_3'])): ?>
+                            <div class="grid grid-cols-3 gap-2 mt-3">
+                                <?php if (!empty($p['extra_image_1'])): ?>
+                                    <img src="../uploads/<?= $p['extra_image_1'] ?>" 
+                                         class="h-16 w-full object-cover rounded shadow">
+                                <?php endif; ?>
+
+                                <?php if (!empty($p['extra_image_2'])): ?>
+                                    <img src="../uploads/<?= $p['extra_image_2'] ?>" 
+                                         class="h-16 w-full object-cover rounded shadow">
+                                <?php endif; ?>
+
+                                <?php if (!empty($p['extra_image_3'])): ?>
+                                    <img src="../uploads/<?= $p['extra_image_3'] ?>" 
+                                         class="h-16 w-full object-cover rounded shadow">
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="text-gray-600 italic">No past events found.</p>
+                <?php endif; ?>
+            </div>
         </div>
 
+        <!-- Sidebar Column -->
+        <div class="sidebar">
+            <!-- =======================
+                CONTACT INFO
+            ======================== -->
+            <div class="contact-card animate-fade-in-up">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">
+                    Contact Information
+                </h3>
+
+                <?php if (!empty($club['contact_description_1'])): ?>
+                    <p class="text-gray-700 mb-3 leading-relaxed"><?= nl2br(htmlspecialchars($club['contact_description_1'])) ?></p>
+                <?php endif; ?>
+
+                <?php if (!empty($club['contact_number_1'])): ?>
+                    <p class="text-gray-700 mb-2 font-medium">Contact 1: <span class="text-blue-600"><?= htmlspecialchars($club['contact_number_1']) ?></span></p>
+                <?php endif; ?>
+
+                <?php if (!empty($club['contact_number_2'])): ?>
+                    <p class="text-gray-700 font-medium">Contact 2: <span class="text-blue-600"><?= htmlspecialchars($club['contact_number_2']) ?></span></p>
+                <?php endif; ?>
+                
+                <?php if (!empty($club['contact_number_1']) || !empty($club['contact_number_2'])): ?>
+                    <div class="mt-4">
+                        <a href="#" class="ios-btn-primary w-full text-center">Get In Touch</a>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="info-card animate-fade-in-up animation-delay-200">
+                <h3 class="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <div class="space-y-3">
+                    <a href="#" class="ios-btn-primary w-full text-center block">Join Club</a>
+                    <a href="#" class="ios-btn-primary w-full text-center block" style="background: linear-gradient(135deg, #6b7280, #9ca3af);">Follow Club</a>
+                    <a href="#" class="ios-btn-primary w-full text-center block" style="background: linear-gradient(135deg, #10b981, #34d399);">Share Club</a>
+                </div>
+            </div>
+        </div>
     </div>
-
 </div>
-
 
 <!-- SHOW MORE SCRIPT -->
 <script>
