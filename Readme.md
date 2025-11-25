@@ -11,6 +11,13 @@ Email: [admin@gmail.com]
 Password: [admin123]
 
 
+Instructions:
+1. Import the SQL database file into phpMyAdmin.
+2. Update database connection settings in includes/db_connection.php.
+3. Start the local server (XAMPP/WAMP).
+4. Open the project in browser.
+
+
 <!-- User side Project Demonstration -->
 
 ### 🔹 1. Searching & Viewing Clubs/Events
